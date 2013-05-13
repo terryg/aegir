@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Oblique</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="#">
+          Oblique Wisdom
+        </a>
+
+        <div class="btn-group pull-right open">
+          <% if current_user %>
+            <%= link_to "http://twitter.com/#{current_user.name}", class: "btn" do %>
+              <i class="icon-user"></i> <%= current_user.name %>
+            <% end %>
+            <%= link_to "Sign Out", signout_path, class: 'btn' %>
+          <% else %>
+            <%= link_to "Sign in with Twitter", "/auth/twitter", class: 'btn' %>
+          <% end %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <%= yield %>
+  </div>
+
+</body>
+</html>

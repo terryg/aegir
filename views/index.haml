@@ -1,0 +1,20 @@
+%h1
+  AEGir
+- if @current_user
+  = @current_user
+
+  #brog-form-container
+    %form{ :action => "/new", :method => "post" }
+      %fieldset
+        %p
+          %label{:for => "body"} Body:
+          %textarea{:name => "body", :rows => "4", :cols => "50", :class => "text"}
+        %p
+          %label{:for => "batch_id"} Batch ID:
+          %input{:type => "text", :name => "batch_id", :class => "text"}
+        %p.button
+          %input{:type => "button", :value => "Send", :class => "button"}
+- else
+  %div
+    %a{:href => "/auth/tumblr"}
+      Sign in with Tumblr
