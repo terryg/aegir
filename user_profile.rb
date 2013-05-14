@@ -7,6 +7,6 @@ class UserProfile
   property :provider, String
   property :created_at, DateTime
   property :updated_at, DateTime
-  property :consumer_key, String
-  property :consumer_secret, String
+  property :access_token, String
+  property :access_token_secret, String
 end

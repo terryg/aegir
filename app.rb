@@ -4,6 +4,7 @@ require 'haml'
 require 'omniauth'
 require 'omniauth-twitter'
 require 'omniauth-tumblr'
+require 'tumblr_client'
 
 require './user_profile'
 require './brog_post'
@@ -17,25 +18,43 @@ class App < Sinatra::Base
   end
 
   get '/' do
-    @current_user = UserProfile.find(session[:id])
+    @current_user = current_user
     @brog_post = BrogPost.new
     haml :index
   end
 
   post '/new' do
+    @current_user = current_user
 
+    Tumblr.configure do |config|
+      config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
+      config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
+      config.oauth_token = @current_user.access_token
+      config.oauth_token_secret = @current_user.access_token_secret
+    end
+
+    client = TumblrClient.new
+
+    body_text = params[:body]
+    body_text << "#batch#{params[:batch_id]}"
+    body_text << "#aegir-bot"
+
+    client.text("#{@current_user.name}.tumblr.com", {:title => "2013-05-13",
+                  :body => body_text})
+
+    redirect '/'
   end
 
   get '/auth/:provider/callback' do
-    auth = request.env['omniauth.auth']
+    auth = auth_hash
     user = UserProfile.first_or_create({:uid => auth[:uid]}, {
                                          :uid => auth[:uid],
                                          :name => auth[:info][:name],
                                          :provider => params[:provider],
                                          :created_at => Time.now,
                                          :updated_at => Time.now,
-                                         :consumer_key => auth['token'],
-                                         :consumer_secret => auth['secret']})
+                                         :access_token => auth[:credentials][:token],
+                                         :access_token_secret => auth[:credentials][:secret]})
     session[:id] = user.id
     redirect '/'
   end
@@ -56,7 +75,7 @@ class App < Sinatra::Base
   end
 
   def current_user
-    @current_user ||= UserProfile.find(session[:uid]) if session[:uid]
+    @current_usser ||= UserProfile.get(session[:id]) if session[:id]
   end
 
   def authenticate
