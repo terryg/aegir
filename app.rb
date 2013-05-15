@@ -36,11 +36,13 @@ class App < Sinatra::Base
     client = Tumblr::Client.new
 
     body_text = params[:body]
-    body_text << "#batch#{params[:batch_id]}"
-    body_text << "#aegir-bot"
+    
+    timestamp = Time.now
 
-    client.text("#{@current_user.name}.tumblr.com", {:title => "2013-05-13",
-                  :body => body_text})
+    client.text("#{@current_user.name}.tumblr.com", {
+                  :title => timestamp.strftime("%Y-%m-%d %H:%M"),
+                  :body => body_text,
+                  :tags => ["aegir-bot", "batch#{params[:batch_id]}"]})
 
     redirect '/'
   end
@@ -60,12 +62,12 @@ class App < Sinatra::Base
   end
 
   get '/auth/failure' do
-    redirect_to '/', :notice => "Sorry, something went wrong. Please try again."
+    redirect '/'
   end
 
   get '/signout' do
     session[:uid] = nil
-    redirect_to '/', :notice => "Signed out!"
+    redirect '/'
   end
   
   private
