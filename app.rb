@@ -25,39 +25,36 @@ class App < Sinatra::Base
 
   post '/new' do
     @current_user = current_user
+    if @current_user
+      Tumblr.configure do |config|
+        config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
+        config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
+        config.oauth_token = session[:token]
+        config.oauth_token_secret = session[:secret]
+      end
 
-    Tumblr.configure do |config|
-      config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
-      config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
-      config.oauth_token = @current_user.access_token
-      config.oauth_token_secret = @current_user.access_token_secret
-    end
-
-    client = Tumblr::Client.new
-
-    body_text = params[:body]
+      client = Tumblr::Client.new
+      
+      body_text = params[:body]
     
-    timestamp = Time.now
+      timestamp = Time.now
 
-    client.text("#{@current_user.name}.tumblr.com", {
+      client.text("#{session[:name]}.tumblr.com", {
                   :title => timestamp.strftime("%Y-%m-%d %H:%M"),
                   :body => body_text,
                   :tags => ["aegir-bot", "batch#{params[:batch_id]}"]})
+    end
 
     redirect '/'
   end
 
   get '/auth/:provider/callback' do
     auth = auth_hash
-    user = UserProfile.first_or_create({:uid => auth[:uid]}, {
-                                         :uid => auth[:uid],
-                                         :name => auth[:info][:name],
-                                         :provider => params[:provider],
-                                         :created_at => Time.now,
-                                         :updated_at => Time.now,
-                                         :access_token => auth[:credentials][:token],
-                                         :access_token_secret => auth[:credentials][:secret]})
-    session[:id] = user.id
+    session[:uid] = auth[:uid]
+    session[:name] = auth[:info][:name]
+    session[:provider]= params[:provider]
+    session[:token] = auth[:credentials][:token]
+    session[:secret] = auth[:credentials][:secret]
     redirect '/'
   end
 
@@ -77,12 +74,12 @@ class App < Sinatra::Base
   end
 
   def current_user
-    @current_usser ||= UserProfile.get(session[:id]) if session[:id]
+    @current_user ||= session[:uid] if session[:uid]
   end
 
   def authenticate
     unless @current_user
-      redirect_to "/"
+      redirect '/'
       return false
     end
   end
