@@ -6,7 +6,6 @@ require 'omniauth-twitter'
 require 'omniauth-tumblr'
 require 'tumblr_client'
 
-require './user_profile'
 require './brog_post'
 
 class App < Sinatra::Base
