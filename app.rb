@@ -33,7 +33,7 @@ class App < Sinatra::Base
       config.oauth_token_secret = @current_user.access_token_secret
     end
 
-    client = TumblrClient.new
+    client = Tumblr::Client.new
 
     body_text = params[:body]
     body_text << "#batch#{params[:batch_id]}"
