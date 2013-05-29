@@ -25,6 +25,14 @@
       Sign in with Tumblr
 
 %div
+  %h3
+    Users
+  - @users.each do |user|
+    %div
+      %a{:href => "/user/#{user.name}"}
+        = user.name
+
+%div
   &nbsp;
 
 %div

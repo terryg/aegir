@@ -18,8 +18,29 @@ class App < Sinatra::Base
 
   get '/' do
     @current_user = current_user
+    @users = UserProfile.all
     @brog_post = BrogPost.new
     haml :index
+  end
+
+  get '/user/:name' do
+    @current_user = current_user
+    @user = UserProfile.first(:name => params[:name])
+    
+    if @user
+      Tumblr.configure do |config|
+        config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
+        config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
+        config.oauth_token = @user.access_token
+        config.oauth_token_secret = @user.access_token_secret
+      end
+
+      client = Tumblr::Client.new
+
+      @posts = client.posts("#{@user.name}.tumblr.com")
+    end
+
+    haml :user
   end
 
   post '/new' do
@@ -28,8 +49,8 @@ class App < Sinatra::Base
       Tumblr.configure do |config|
         config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
         config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
-        config.oauth_token = session[:token]
-        config.oauth_token_secret = session[:secret]
+        config.oauth_token = @current_user.access_token
+        config.oauth_token_secret = @current_user.access_token_secret
       end
 
       client = Tumblr::Client.new
@@ -45,6 +66,10 @@ class App < Sinatra::Base
     end
 
     redirect '/'
+  end
+
+  get '/list/:name' do
+
   end
 
   get '/auth/:provider/callback' do
@@ -73,7 +98,7 @@ class App < Sinatra::Base
   end
 
   def current_user
-    @current_user ||= session[:uid] if session[:uid]
+    @current_user ||= UserProfile.first(:uid => session[:uid]) if session[:uid]
   end
 
   def authenticate
