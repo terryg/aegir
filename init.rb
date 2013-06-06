@@ -13,6 +13,6 @@ require "omniauth-tumblr"
 
 require "./user_profile"
 
-DataMapper.setup(:default, (ENV['HEROKU_POSTGRESQL_GOLD_URL'] || "postgres://localhost:5432/aegir_development"))
+DataMapper.setup(:default, (ENV['HEROKU_POSTGRESQL_BRONZE_URL'] || "postgres://localhost:5432/aegir_development"))
 DataMapper.auto_upgrade!
 
