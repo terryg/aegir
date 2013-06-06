@@ -7,13 +7,14 @@
 
 %div
   %h2 
-    = "#{@user.name} has been brogging since #{@user.created_at.strftime("%Y-%m-%d")}"
+    = @batch_id
 
 %div
-- @batches.each do |batch|
+- @posts.each do |post|
   %div
-  %a{:href=>"/user/#{@user.name}/#{batch}"}
-    = batch
+    %strong
+      = post["title"]
+    = post["body"]
 
 %div
   &nbsp;

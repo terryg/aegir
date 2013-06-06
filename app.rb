@@ -5,11 +5,14 @@ require 'omniauth'
 require 'omniauth-twitter'
 require 'omniauth-tumblr'
 require 'tumblr_client'
+require 'json'
 
 require './brog_post'
 
 class App < Sinatra::Base
   enable :sessions
+
+  AEGIR_TAG = "aegir-bot"
 
   use OmniAuth::Builder do
     provider :tumblr, ENV['TUMBLR_CONSUMER_KEY'], ENV['TUMBLR_CONSUMER_SECRET']
@@ -37,10 +40,41 @@ class App < Sinatra::Base
 
       client = Tumblr::Client.new
 
-      @posts = client.posts("#{@user.name}.tumblr.com")
+      @batches = []
+      response = client.posts("#{@user.name}.tumblr.com", :tag => AEGIR_TAG)
+      response["posts"].each do |post|
+        post["tags"].each do |t|
+          @batches << t
+        end
+      end
+
+      @batches.uniq!
+      @batches.delete(AEGIR_TAG)
     end
 
     haml :user
+  end
+
+  get '/user/:name/:batch' do
+    @current_user = current_user
+    @user = UserProfile.first(:name => params[:name])
+    
+    if @user
+      Tumblr.configure do |config|
+        config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
+        config.consumer_secret = ENV['TUMBLR_CONSUMER_SECRET']
+        config.oauth_token = @user.access_token
+        config.oauth_token_secret = @user.access_token_secret
+      end
+
+      client = Tumblr::Client.new
+
+      response = client.posts("#{@user.name}.tumblr.com", :tag => [AEGIR_TAG, params[:batch]])
+      @posts = response["posts"] if response
+      @posts ||= []
+    end
+
+    haml :batch
   end
 
   post '/new' do
@@ -62,7 +96,7 @@ class App < Sinatra::Base
       client.text("#{session[:name]}.tumblr.com", {
                   :title => timestamp.strftime("%Y-%m-%d %H:%M"),
                   :body => body_text,
-                  :tags => ["aegir-bot", "batch#{params[:batch_id]}"]})
+                  :tags => [AEGIR_TAG, "batch#{params[:batch_id]}"]})
     end
 
     redirect '/'
