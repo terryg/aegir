@@ -108,11 +108,16 @@ class App < Sinatra::Base
 
   get '/auth/:provider/callback' do
     auth = auth_hash
-    session[:uid] = auth[:uid]
-    session[:name] = auth[:info][:name]
-    session[:provider]= params[:provider]
-    session[:token] = auth[:credentials][:token]
-    session[:secret] = auth[:credentials][:secret]
+    user = UserProfile.first_or_create({:uid => auth[:uid]}, {
+                                         :uid => auth[:uid],
+                                         :name => auth[:info][:name],
+                                         :provider => params[:provider],
+                                         :created_at => Time.now,
+                                         :updated_at => Time.now,
+                                         :access_token => auth[:credentials][:token],
+                                         :access_token_secret => auth[:credentials][:secret] })
+    
+    session[:uid] = user.uid
     redirect '/'
   end
 
