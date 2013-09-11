@@ -29,7 +29,7 @@ class App < Sinatra::Base
   get '/user/:name' do
     @current_user = current_user
     @user = UserProfile.first(:name => params[:name])
-    
+
     if @user
       Tumblr.configure do |config|
         config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
@@ -79,6 +79,7 @@ class App < Sinatra::Base
 
   post '/new' do
     @current_user = current_user
+
     if @current_user
       Tumblr.configure do |config|
         config.consumer_key = ENV['TUMBLR_CONSUMER_KEY']
@@ -88,16 +89,26 @@ class App < Sinatra::Base
       end
 
       client = Tumblr::Client.new
-      
+
+      puts "***** made client"
+
       body_text = params[:body]
     
       timestamp = Time.now
 
-      client.text("#{session[:name]}.tumblr.com", {
-                  :title => timestamp.strftime("%Y-%m-%d %H:%M"),
-                  :body => body_text,
-                  :tags => [AEGIR_TAG, "batch#{params[:batch_id]}"]})
+      puts "**** Starting..."
+
+      resp = client.text("#{@current_user.name}.tumblr.com", {
+                           :title => timestamp.strftime("%Y-%m-%d %H:%M"),
+                           :body => body_text,
+                           :tags => [AEGIR_TAG, "batch#{params[:batch_id]}"]})
+
+
+      puts "**** Done."
+    else
+      puts "**** Current User is nil!"
     end
+
 
     redirect '/'
   end
