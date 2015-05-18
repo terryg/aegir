@@ -10,7 +10,8 @@ require 'json'
 require './brog_post'
 
 class App < Sinatra::Base
-  enable :sessions
+	use Rack::Session::Cookie, :key => 'rack.session', :secret => 'formica-bituminous-lahey-this-is-the-patently-secret-thing'
+	enable :logging
 
   AEGIR_TAG = "aegir-bot"
 
@@ -119,6 +120,7 @@ class App < Sinatra::Base
 
   get '/auth/:provider/callback' do
     auth = auth_hash
+
     user = UserProfile.first_or_create({:uid => auth[:uid]}, {
                                          :uid => auth[:uid],
                                          :name => auth[:info][:name],
@@ -129,6 +131,48 @@ class App < Sinatra::Base
                                          :access_token_secret => auth[:credentials][:secret] })
     
     session[:uid] = user.uid
+
+
+		puts "*** provider is #{params[:provider]}"
+
+		if params[:provider] == 'tumblr'
+      @blogs = []
+      auth[:extra][:raw_info][:blogs].each do |b|
+        @blogs << b[:name]
+      end
+
+			puts "$$$ blog size is #{@blogs.size}"
+
+      if @blogs.size > 1
+        haml :tumblr
+      else
+        redirect '/'
+		  end
+		else
+      redirect '/'
+		end
+  end
+
+  post '/tumblr' do
+		blogname = params[:blogname]  
+
+		puts "XXXX blogname is #{blogname}"
+		puts "XXXX anything else?"
+    puts params
+
+		user = current_user
+
+		puts "CCCC #{user.uid}"
+
+
+		unless user.nil?
+			user.uid = blogname
+			user.name = blogname
+			if user.save
+				session[:uid] = blogname
+			end
+    end
+    
     redirect '/'
   end
 
@@ -148,6 +192,7 @@ class App < Sinatra::Base
   end
 
   def current_user
+		puts "SSSSSSSSS session has #{session[:uid]}"
     @current_user ||= UserProfile.first(:uid => session[:uid]) if session[:uid]
   end
 

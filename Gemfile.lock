@@ -106,3 +106,6 @@ DEPENDENCIES
   pg
   sinatra
   tumblr_client
+
+BUNDLED WITH
+   1.10.0.pre.2
