@@ -71,8 +71,9 @@ class App < Sinatra::Base
       client = Tumblr::Client.new
 
       response = client.posts("#{@user.name}.tumblr.com", :tag => [AEGIR_TAG, params[:batch]])
-      @posts = response["posts"] if response
-      @posts ||= []
+      @posts = []
+			@posts = response["posts"] if response
+			@posts.reverse!
     end
 
     haml :batch
