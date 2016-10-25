@@ -1,51 +1,56 @@
-%div
-  %img{:src => "aegir-small.png"}
-%div
-  %h1
-    %a{:href=>"/"}
-      &AElig;gir - a brew blogging tool
-
-%div
-  %img{:src => "aegir.jpg"}
-
-- if @current_user
+.container
   %div
-    %strong
-      = @current_user.uid
+    %img{:src => "aegir-small.png"}
+  %div
+    %h1
+      %a{:href=>"/"}
+        &AElig;gir - a brew blogging tool
 
   %div
-    %a{:href => "/signout"}
-      Signout
+    %img{:src => "aegir.jpg"}
 
-  %div
-    %form{ :action => "/new", :method => "post" }
-      %fieldset
-        %p
-          %label{:for => "body"} Body:
-          %textarea{:name => "body", :rows => "4", :cols => "50", :class => "text"}
-        %p
-          %label{:for => "batch_id"} Batch ID:
-          %input{:type => "text", :name => "batch_id", :class => "text"}
-        %p.button
-          %input{:type => "submit", :value => "Send", :class => "button"}
-
-- else
-  %div
-    %a{:href => "/auth/tumblr"}
-      Sign in with Tumblr
-
-%div
-  %h3
-    Users
-  - @users.each do |user|
+  - if @current_user
     %div
-      %a{:href => "/user/#{user.name}"}
-        = user.name
+      %strong
+        = @current_user.uid
 
-%div
-  &nbsp;
+    %div
+      %a{:href => "/signout"}
+        Signout
 
-%div
-  Find me on <a href="http://github.com/terryg/aegir">github</a>.
+    %div
+      %form{ :action => "/new", :method => "post" }
+        %fieldset
+          %p
+            %label{:for => "body"} Body:
+            %textarea{:name => "body", :rows => "4", :cols => "50", :class => "text"}
+          %p
+            %label{:for => "batch_id"} Batch ID:
+            %input{:type => "text", :name => "batch_id", :class => "text"}
+          %p.button
+            %input{:type => "submit", :value => "Send", :class => "button"}
+
+  - else
+    %div
+      %a{:href => "/auth/tumblr"}
+        Sign in with Tumblr
+
+  .container
+    .row
+      .col-xs-4
+      .col-xs-4
+      .col-xs-4
+        %h3
+          Users
+        - @users.each do |user|
+          %div
+            %a{:href => "/user/#{user.name}"}
+              = user.name
+
+  %div
+    &nbsp;
+
+  %div
+    Find me on <a href="http://github.com/terryg/aegir">github</a>.
 
 = File.read(File.join('views', 'google_analytics.html'))
