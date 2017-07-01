@@ -10,8 +10,8 @@ require 'json'
 require './brog_post'
 
 class App < Sinatra::Base
-	use Rack::Session::Cookie, :key => 'rack.session', :secret => 'formica-bituminous-lahey-this-is-the-patently-secret-thing'
-	enable :logging
+  use Rack::Session::Cookie, :key => 'rack.session', :secret => 'formica-bituminous-lahey-this-is-the-patently-secret-thing'
+  enable :logging
 
   AEGIR_TAG = "aegir-bot"
 
@@ -19,7 +19,7 @@ class App < Sinatra::Base
     provider :tumblr, ENV['TUMBLR_CONSUMER_KEY'], ENV['TUMBLR_CONSUMER_SECRET']
     provider :twitter, ENV['TWITTER_CONSUMER_KEY'], ENV['TWITTER_CONSUMER_SECRET']
   end
-
+  
   get '/' do
     @current_user = current_user
     @users = UserProfile.all
@@ -72,8 +72,8 @@ class App < Sinatra::Base
 
       response = client.posts("#{@user.name}.tumblr.com", :tag => [AEGIR_TAG, params[:batch]])
       @posts = []
-			@posts = response["posts"] if response
-			@posts.reverse!
+      @posts = response["posts"] if response
+      @posts.reverse!
     end
 
     haml :batch
@@ -95,7 +95,7 @@ class App < Sinatra::Base
       puts "***** made client"
 
       body_text = params[:body]
-    
+      
       timestamp = Time.now
 
       puts "**** Starting..."
@@ -134,44 +134,44 @@ class App < Sinatra::Base
     session[:uid] = user.uid
 
 
-		puts "*** provider is #{params[:provider]}"
+    puts "*** provider is #{params[:provider]}"
 
-		if params[:provider] == 'tumblr'
+    if params[:provider] == 'tumblr'
       @blogs = []
       auth[:extra][:raw_info][:blogs].each do |b|
         @blogs << b[:name]
       end
 
-			puts "$$$ blog size is #{@blogs.size}"
+      puts "$$$ blog size is #{@blogs.size}"
 
       if @blogs.size > 1
         haml :tumblr
       else
         redirect '/'
-		  end
-		else
+      end
+    else
       redirect '/'
-		end
+    end
   end
 
   post '/tumblr' do
-		blogname = params[:blogname]  
+    blogname = params[:blogname]  
 
-		puts "XXXX blogname is #{blogname}"
-		puts "XXXX anything else?"
+    puts "XXXX blogname is #{blogname}"
+    puts "XXXX anything else?"
     puts params
 
-		user = current_user
+    user = current_user
 
-		puts "CCCC #{user.uid}"
+    puts "CCCC #{user.uid}"
 
 
-		unless user.nil?
-			user.uid = blogname
-			user.name = blogname
-			if user.save
-				session[:uid] = blogname
-			end
+    unless user.nil?
+      user.uid = blogname
+      user.name = blogname
+      if user.save
+	session[:uid] = blogname
+      end
     end
     
     redirect '/'
@@ -193,7 +193,7 @@ class App < Sinatra::Base
   end
 
   def current_user
-		puts "SSSSSSSSS session has #{session[:uid]}"
+    puts "SSSSSSSSS session has #{session[:uid]}"
     @current_user ||= UserProfile.first(:uid => session[:uid]) if session[:uid]
   end
 
