@@ -1,6 +1,8 @@
-aegir
-=====
+# aegir
 
-A brew blogging web service.
+> A brew blogging web service.
 
 http://aegir.herokuapp.com
+
+## Getting Started
+

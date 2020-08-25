@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# A user model
 class UserProfile
   include DataMapper::Resource
 
