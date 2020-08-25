@@ -20,3 +20,5 @@ group :development, :test do
   gem 'rubocop'
   gem 'shotgun'
 end
+
+gem "puma", "~> 4.3"

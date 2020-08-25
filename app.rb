@@ -94,21 +94,15 @@ class App < Sinatra::Base
 
       client = Tumblr::Client.new
 
-      puts '***** made client'
-
       body_text = params[:body]
 
       timestamp = Time.now
-
-      puts '**** Starting...'
 
       resp = client.text("#{@current_user.name}.tumblr.com", {
                            title: timestamp.strftime('%Y-%m-%d %H:%M'),
                            body: body_text,
                            tags: [AEGIR_TAG, "batch#{params[:batch_id]}"]
                          })
-
-      puts '**** Done.'
     else
       puts '**** Current User is nil!'
     end
@@ -134,15 +128,11 @@ class App < Sinatra::Base
 
     session[:uid] = user.uid
 
-    puts "*** provider is #{params[:provider]}"
-
     if params[:provider] == 'tumblr'
       @blogs = []
       auth[:extra][:raw_info][:blogs].each do |b|
         @blogs << b[:name]
       end
-
-      puts "$$$ blog size is #{@blogs.size}"
 
       if @blogs.size > 1
         haml :tumblr
@@ -157,13 +147,7 @@ class App < Sinatra::Base
   post '/tumblr' do
     blogname = params[:blogname]
 
-    puts "XXXX blogname is #{blogname}"
-    puts 'XXXX anything else?'
-    puts params
-
     user = current_user
-
-    puts "CCCC #{user.uid}"
 
     unless user.nil?
       user.uid = blogname
@@ -190,7 +174,6 @@ class App < Sinatra::Base
   end
 
   def current_user
-    puts "SSSSSSSSS session has #{session[:uid]}"
     @current_user ||= UserProfile.first(uid: session[:uid]) if session[:uid]
   end
 
