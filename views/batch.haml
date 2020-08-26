@@ -1,23 +1,24 @@
-%div
-  %img{:src => "/aegir-small.png"}
-%div
-  %h1
-    %a{:href=>"/"}
-      &AElig;gir - a brew blogging tool
-
-%div
-  %h2 
-    = @batch_id
-
-%div
-- @posts.each do |post|
+.container
   %div
-    %strong
-      = post["title"]
-    = post["body"]
+    %img{:src => "/aegir-small.png"}
+  %div
+    %h1
+      %a{:href=>"/"}
+        &AElig;gir - a brew blogging tool
 
-%div
-  &nbsp;
+  %div
+    %h2 
+      = @batch_id
 
-%div
-  Find me on <a href="http://github.com/terryg/aegir">github</a>.
+  %div
+  - @posts.each do |post|
+    %div
+      %strong
+        = post["title"]
+      = post["body"]
+
+  %div
+    &nbsp;
+
+  %div
+    Find me on <a href="http://github.com/terryg/aegir">github</a>.
